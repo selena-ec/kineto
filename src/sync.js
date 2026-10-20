@@ -13,14 +13,20 @@ export function createCloudSync({ config, getState, replaceState, onStatus }) {
   }
 
   function load(force = false) {
+    requestLoad({ force });
+  }
+
+  function requestLoad({ force = false, verifyTimestamp = "" } = {}) {
     if (!enabled) {
       onStatus("Progress is saved on this device.", { hideButton: true });
       return;
     }
 
-    onStatus(force ? "Refreshing…" : "Loading synced progress…", {
-      disabled: true,
-    });
+    if (!verifyTimestamp) {
+      onStatus(force ? "Refreshing…" : "Loading synced progress…", {
+        disabled: true,
+      });
+    }
     const callbackName = `kinetoLoad_${Date.now()}`;
     const script = document.createElement("script");
     const requestUrl = new URL(url);
@@ -39,6 +45,17 @@ export function createCloudSync({ config, getState, replaceState, onStatus }) {
       cleanup();
       if (!response?.ok) {
         onStatus("Cloud sync unavailable. Progress is safe on this device.");
+        return;
+      }
+
+      if (verifyTimestamp) {
+        if (response.state?.updatedAt === verifyTimestamp) {
+          onStatus("Progress synced.");
+        } else {
+          onStatus(
+            "Cloud save not confirmed. Progress is still saved on this device—tap Sync now to retry.",
+          );
+        }
         return;
       }
 
@@ -63,40 +80,34 @@ export function createCloudSync({ config, getState, replaceState, onStatus }) {
 
   function sendSave() {
     if (!enabled) return;
+    clearTimeout(saveTimer);
     onStatus("Saving…");
-    const frameName = "kinetoSyncFrame";
-    let frame = document.querySelector(`iframe[name="${frameName}"]`);
-    if (!frame) {
-      frame = document.createElement("iframe");
-      frame.name = frameName;
-      frame.hidden = true;
-      document.body.append(frame);
-    }
+    const state = getState();
+    const expectedTimestamp = state.updatedAt;
+    const body = new window.URLSearchParams();
+    body.set("payload", JSON.stringify({ appVersion: APP_VERSION, state }));
+    if (token) body.set("token", token);
 
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = url;
-    form.target = frameName;
-    form.hidden = true;
-    addField(
-      form,
-      "payload",
-      JSON.stringify({ appVersion: APP_VERSION, state: getState() }),
-    );
-    if (token) addField(form, "token", token);
-    document.body.append(form);
-    form.submit();
-    form.remove();
-    setTimeout(() => onStatus("Saved locally. Cloud save sent."), 700);
+    window
+      .fetch(url, {
+        method: "POST",
+        mode: "no-cors",
+        keepalive: true,
+        body,
+      })
+      .then(() => {
+        onStatus("Verifying cloud save…");
+        setTimeout(
+          () => requestLoad({ verifyTimestamp: expectedTimestamp }),
+          900,
+        );
+      })
+      .catch(() =>
+        onStatus(
+          "Cloud save failed. Progress is still saved on this device—tap Sync now to retry.",
+        ),
+      );
   }
 
   return { enabled, load, scheduleSave };
-}
-
-function addField(form, name, value) {
-  const input = document.createElement("input");
-  input.type = "hidden";
-  input.name = name;
-  input.value = value;
-  form.append(input);
 }
