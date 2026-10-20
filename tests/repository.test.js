@@ -4,6 +4,7 @@ import test from "node:test";
 
 const html = await readFile("index.html", "utf8");
 const backend = await readFile("google-apps-script.gs", "utf8");
+const ui = await readFile("src/ui.js", "utf8");
 
 test("interface contains day-first controls and no legacy notes", () => {
   assert.match(html, /data-day-tabs/);
@@ -17,4 +18,8 @@ test("interface contains day-first controls and no legacy notes", () => {
 test("backend retains the unified state sheet", () => {
   assert.match(backend, /KinetoState/);
   assert.match(backend, /sanitizeState_/);
+});
+
+test("every week defaults to the current local weekday", () => {
+  assert.match(ui, /index \+ 1,\s*new Date\(\)\.getDay\(\)/);
 });

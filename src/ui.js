@@ -24,7 +24,7 @@ export function createTrackerView({
   const selectedDays = Object.fromEntries(
     Array.from({ length: PLAN_WEEKS }, (_, index) => [
       index + 1,
-      index + 1 === initialWeek ? new Date().getDay() : 0,
+      new Date().getDay(),
     ]),
   );
   const openHistories = new Set();
