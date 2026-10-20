@@ -1,5 +1,5 @@
 import { PROGRAMS, WORKOUTS } from "./src/catalog.js";
-import { cycleWeek } from "./src/dates.js";
+import { cycleWeek } from "./src/dates.js?v=20261019-week-1";
 import { createStateStore } from "./src/storage.js";
 import { createCloudSync } from "./src/sync.js?v=20261019-verified-sync";
 import { createTrackerView } from "./src/ui.js";

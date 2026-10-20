@@ -126,10 +126,11 @@ test("completion totals count programs by day and week", () => {
   assert.equal(completedInWeek(state, PROGRAMS, 1), 3);
 });
 
-test("cycle dates begin on September 6 and stop at Week 8", () => {
-  assert.equal(cycleWeek(new Date(2026, 8, 5)), 1);
+test("cycle dates begin on October 18 and stop at Week 8", () => {
+  assert.equal(cycleWeek(new Date(2026, 9, 17)), 1);
   assert.equal(cycleWeek(PLAN_START), 1);
-  assert.equal(cycleWeek(new Date(2026, 8, 13)), 2);
+  assert.equal(cycleWeek(new Date(2026, 9, 19)), 1);
+  assert.equal(cycleWeek(new Date(2026, 9, 25)), 2);
   assert.equal(cycleWeek(new Date(2027, 0, 1)), 8);
 });
 

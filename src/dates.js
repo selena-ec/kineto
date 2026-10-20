@@ -9,7 +9,7 @@ export const DAYS = [
 ];
 
 export const PLAN_WEEKS = 8;
-export const PLAN_START = new Date(2026, 8, 6);
+export const PLAN_START = new Date(2026, 9, 18);
 
 export function cycleWeek(date, start = PLAN_START, totalWeeks = PLAN_WEEKS) {
   if (date < start) return 1;
