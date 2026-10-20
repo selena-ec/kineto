@@ -6,6 +6,44 @@ export const PROGRAMS = [
   { id: "backbend", name: "Backbend", showsLevel: true },
 ];
 
+export const DAY_ROUTINES = {
+  0: {
+    id: "balance",
+    label: "Mobility & turnout",
+    programs: ["flexibility", "turnout"],
+  },
+  1: {
+    id: "balance",
+    label: "Mobility & turnout",
+    programs: ["flexibility", "turnout"],
+  },
+  2: {
+    id: "power",
+    label: "Technique & strength",
+    programs: ["pirouette", "foot-ankle", "backbend"],
+  },
+  3: {
+    id: "balance",
+    label: "Mobility & turnout",
+    programs: ["flexibility", "turnout"],
+  },
+  4: {
+    id: "power",
+    label: "Technique & strength",
+    programs: ["pirouette", "foot-ankle", "backbend"],
+  },
+  5: {
+    id: "balance",
+    label: "Mobility & turnout",
+    programs: ["flexibility", "turnout"],
+  },
+  6: {
+    id: "power",
+    label: "Technique & strength",
+    programs: ["pirouette", "foot-ankle", "backbend"],
+  },
+};
+
 export const WORKOUTS = {
   flexibility: [
     "Hip Mobility Beginner - Workout 1",

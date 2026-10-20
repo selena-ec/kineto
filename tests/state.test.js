@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { PROGRAMS, WORKOUTS, workoutLevel } from "../src/catalog.js";
+import {
+  DAY_ROUTINES,
+  PROGRAMS,
+  WORKOUTS,
+  workoutLevel,
+} from "../src/catalog.js";
 import { cycleWeek, PLAN_START } from "../src/dates.js";
 import {
   completedInWeek,
@@ -8,9 +13,11 @@ import {
   completedWorkoutSessions,
   createEmptyState,
   entryKey,
+  getProgramSessions,
   normalizeState,
   latestRelatedSession,
   SCHEMA_VERSION,
+  setProgramSessions,
   suggestedRelatedWorkout,
   workoutFamily,
 } from "../src/state.js";
@@ -32,6 +39,28 @@ test("catalogue preserves program order and workout counts", () => {
       backbend: 26,
     },
   );
+});
+
+test("day routines alternate between the fixed program sets", () => {
+  assert.deepEqual(DAY_ROUTINES[1].programs, ["flexibility", "turnout"]);
+  assert.deepEqual(DAY_ROUTINES[3].programs, ["flexibility", "turnout"]);
+  assert.deepEqual(DAY_ROUTINES[5].programs, ["flexibility", "turnout"]);
+  assert.deepEqual(DAY_ROUTINES[0].programs, ["flexibility", "turnout"]);
+  assert.deepEqual(DAY_ROUTINES[2].programs, [
+    "pirouette",
+    "foot-ankle",
+    "backbend",
+  ]);
+  assert.deepEqual(DAY_ROUTINES[4].programs, [
+    "pirouette",
+    "foot-ankle",
+    "backbend",
+  ]);
+  assert.deepEqual(DAY_ROUTINES[6].programs, [
+    "pirouette",
+    "foot-ankle",
+    "backbend",
+  ]);
 });
 
 test("new state starts without invented workout assignments", () => {
@@ -84,9 +113,15 @@ test("legacy completion keys migrate when a matching workout exists", () => {
 
 test("completion totals count programs by day and week", () => {
   const state = createEmptyState();
-  state.completed[entryKey("flexibility", 1, 3)] = true;
-  state.completed[entryKey("turnout", 1, 3)] = true;
-  state.completed[entryKey("backbend", 1, 4)] = true;
+  setProgramSessions(state, "flexibility", 1, 3, [
+    { workout: "Front Split Beginner - Workout 1", completed: true },
+  ]);
+  setProgramSessions(state, "turnout", 1, 3, [
+    { workout: "Week 1 & 2 - Workout 1", completed: true },
+  ]);
+  setProgramSessions(state, "backbend", 1, 4, [
+    { workout: "Beginner - Week 1 & 2, Workout 1", completed: true },
+  ]);
   assert.equal(completedOnDay(state, PROGRAMS, 1, 3), 2);
   assert.equal(completedInWeek(state, PROGRAMS, 1), 3);
 });
@@ -113,7 +148,7 @@ test("workout history groups related sessions and suggests the next workout", ()
 
   assert.equal(workoutFamily(workout1), "Pancake Beginner");
   assert.deepEqual(completedWorkoutSessions(state, "flexibility", workout1), [
-    { week: 1, day: 1, key: first },
+    { week: 1, day: 1, key: first, index: 0 },
   ]);
   assert.deepEqual(latestRelatedSession(state, "flexibility", workout2, 1, 3), {
     week: 1,
@@ -124,4 +159,17 @@ test("workout history groups related sessions and suggests the next workout", ()
     suggestedRelatedWorkout(WORKOUTS.flexibility, workout1),
     workout2,
   );
+});
+
+test("multiple sessions for the same program and day keep independent completion", () => {
+  const state = createEmptyState();
+  setProgramSessions(state, "flexibility", 2, 2, [
+    { workout: "Hip Mobility Beginner - Workout 2", completed: true },
+    { workout: "Hip Mobility Beginner - Workout 1", completed: false },
+  ]);
+  assert.deepEqual(getProgramSessions(state, "flexibility", 2, 2), [
+    { workout: "Hip Mobility Beginner - Workout 2", completed: true },
+    { workout: "Hip Mobility Beginner - Workout 1", completed: false },
+  ]);
+  assert.equal(completedOnDay(state, PROGRAMS, 2, 2), 1);
 });

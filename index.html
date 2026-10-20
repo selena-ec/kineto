@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#315f7f" />
     <title>Kineto Training Tracker</title>
-    <link rel="stylesheet" href="styles.css?v=20260905-history" />
+    <link rel="stylesheet" href="styles.css?v=20261019-orange-routines" />
     <script src="config.js"></script>
-    <script src="app.js?v=20260905-history" type="module"></script>
+    <script src="app.js?v=20261019-routines" type="module"></script>
   </head>
   <body>
     <header class="app-header">
@@ -15,7 +15,7 @@
         <p class="eyebrow">Ballet conditioning</p>
         <h1>Kineto</h1>
         <p class="header-subtitle">
-          Five programs. One focused practice each day.
+          Two alternating routines. As many sessions as your day allows.
         </p>
       </div>
       <button class="secondary-button" id="resetProgress" type="button">
@@ -37,11 +37,12 @@
             <p class="date-label">Eight-week routine</p>
             <h2 id="trackerTitle">Weekly training</h2>
             <p>
-              Select a day, choose its workouts, then mark each one complete.
+              Select a day, follow its routine, and add extra sessions whenever
+              you have time.
             </p>
           </div>
           <div class="week-summary">
-            <strong id="weekCompleted">0</strong><span>/ 35</span>
+            <strong id="weekCompleted">0</strong><span>sessions</span>
             <small>complete this week</small>
           </div>
         </div>
@@ -69,17 +70,19 @@
             role="group"
             aria-label="Choose a day"
           ></div>
-          <div class="selected-day-banner">
-            <strong>Selected day: <span data-selected-day></span></strong>
+          <div class="selected-day-banner" data-day-banner>
+            <div>
+              <strong><span data-selected-day></span></strong>
+              <span data-routine-name></span>
+            </div>
             <span
-              >Choose this day’s workouts, then check the circles when
-              complete.</span
+              >Choose a workout, mark it complete, or add another session.</span
             >
           </div>
           <div class="workout-table">
             <div class="table-heading">
               <span>Program</span><span data-workout-heading></span
-              ><span>Done</span>
+              ><span></span>
             </div>
             <div data-program-rows></div>
           </div>
@@ -93,6 +96,24 @@
           <span class="program-number" data-program-number></span>
           <strong data-program-name></strong>
         </div>
+        <div class="session-list" data-session-list></div>
+        <div class="program-actions">
+          <button class="add-session-button" type="button" data-add-session>
+            + Add another session
+          </button>
+          <button
+            class="history-toggle"
+            type="button"
+            data-history-toggle
+          ></button>
+        </div>
+        <div class="workout-history" data-workout-history hidden></div>
+      </div>
+    </template>
+
+    <template id="sessionRowTemplate">
+      <div class="session-row">
+        <span class="session-number" data-session-number></span>
         <div class="workout-choice">
           <div class="workout-select-line">
             <select data-workout-select>
@@ -103,11 +124,6 @@
           <div class="workout-context" data-workout-context hidden>
             <span data-last-session></span>
             <strong data-suggestion></strong>
-            <button
-              class="history-toggle"
-              type="button"
-              data-history-toggle
-            ></button>
           </div>
         </div>
         <label class="complete-control">
@@ -115,7 +131,9 @@
           <span class="complete-circle" aria-hidden="true"></span>
           <span class="sr-only" data-complete-label></span>
         </label>
-        <div class="workout-history" data-workout-history hidden></div>
+        <button class="remove-session-button" type="button" data-remove-session>
+          Remove
+        </button>
       </div>
     </template>
   </body>

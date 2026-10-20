@@ -1,4 +1,4 @@
-const APP_VERSION = "kineto-v12";
+const APP_VERSION = "kineto-v13-routines";
 
 export function createCloudSync({ config, getState, replaceState, onStatus }) {
   const url = (config.GOOGLE_APPS_SCRIPT_URL || "").trim();

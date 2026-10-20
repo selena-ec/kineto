@@ -105,7 +105,7 @@ function sanitizeState_(value) {
     if (
       validTrackerKey_(key) &&
       typeof workout === "string" &&
-      workout.length <= 200
+      workout.length <= 5000
     ) {
       selections[key] = workout;
     }
