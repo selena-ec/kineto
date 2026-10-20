@@ -26,6 +26,7 @@ test("every week defaults to the current local weekday", () => {
 });
 
 test("cloud saves survive refresh and require read-back confirmation", () => {
+  assert.match(html, /app\.js\?v=20261019-verified-sync/);
   assert.match(sync, /keepalive:\s*true/);
   assert.match(sync, /verifyTimestamp/);
   assert.match(sync, /Verifying cloud save/);
